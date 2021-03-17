@@ -28,7 +28,6 @@ def get_candidate_models():
         'PyroFactor_l5' : PyroFactorizationModel(model = pyro_model.model_factorization, guide = pyro_model.guide_factorization, n_latent = 5, pred_fn = pyro_model.pred_fn_factorization),
         'PyroFactor_l10' : PyroFactorizationModel(model = pyro_model.model_factorization, guide = pyro_model.guide_factorization, n_latent = 10, pred_fn = pyro_model.pred_fn_factorization),
         'PyroFactor_l20' : PyroFactorizationModel(model = pyro_model.model_factorization, guide = pyro_model.guide_factorization, n_latent = 20, pred_fn = pyro_model.pred_fn_factorization),
-        'PyroHier_l3_ql2' : PyroHierarchicalModel(model = pyro_model.model_hierarchical, guide = pyro_model.guide_hierarchical, n_latent = 3, ques_attrib_n_latent = [2], pred_fn = pyro_model.pred_fn_hierarchical, l2_factor = 0.1),
     }
 
 
