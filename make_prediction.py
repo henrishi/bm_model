@@ -3,11 +3,14 @@
 
 import logging
 import os
+import argparse
 import pickle
 from pdb import set_trace
 
 from experiment import EvalExperiment
 from run_experiment import get_candidate_models
+
+from utils import set_logger
 
 def get_param_paths(param_dir, model_name):
     dir_content = os.listdir(param_dir)
