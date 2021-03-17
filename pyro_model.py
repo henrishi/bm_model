@@ -1,6 +1,8 @@
-# Pyro models for person-item response
-#
-# Author: Zhaolei (Henry) Shi -- zshi2@stanford.edu
+"""
+Pyro models for person-item response
+
+Author: Zhaolei (Henry) Shi -- zshi2@stanford.edu
+"""
 
 from pdb import set_trace
 
