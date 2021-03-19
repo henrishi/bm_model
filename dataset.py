@@ -1,10 +1,14 @@
 """ Data loaders
 """
 
+from pdb import set_trace
+
+import numpy as np
+
 import torch
 from sklearn import preprocessing
 
-from holder import PyroDataset, AttribDataset
+from holder import PyroDataset, AttribDataset, FixedParamsDataset
 
 def create_dataset(df, use_tvt, tvt_vector = None):
     person_encoder = preprocessing.LabelEncoder()
@@ -66,4 +70,57 @@ def create_attrib_dataset(df, use_tvt, tvt_vector = None):
             )
 
 def create_fixedparam_dataset(df, fixed_params, use_tvt, tvt_vector = None):
-    pass
+
+    # Take out responses that are interact
+    # fixed question id with fixed student if.
+    # Data won't do anything for them.
+    fp_stu = fixed_params['stu_param']['id']
+    fp_ques = fixed_params['ques_param']['id']
+    df = df[~(df['student_id'].isin(fp_stu) & df['question_id'].isin(fp_ques))]
+    df = df.reset_index(drop = True)
+
+
+    # Now filter reverse direction by removing
+    # the parameters and keeping only those in
+    # the dataset
+    select_stu = np.isin(fp_stu, df.student_id.values)
+    select_ques = np.isin(fp_ques, df.question_id.values)
+    fixed_stu_params = {
+        'id' : fp_stu[select_stu],
+        'params' : {
+            name : fixed_params['stu_param']['params'][name][select_stu] \
+            for name in fixed_params['stu_param']['params']
+        },
+    }
+    fixed_ques_params = {
+        'id' : fp_ques[select_ques],
+        'params' : {
+            name : fixed_params['ques_param']['params'][name][select_ques] \
+            for name in fixed_params['ques_param']['params']
+        },
+    }
+
+    # typical processing
+    person_encoder = preprocessing.LabelEncoder()
+    item_encoder = preprocessing.LabelEncoder()
+
+    person_encoder.fit(df.student_id)
+    item_encoder.fit(df.question_id)
+
+    df['student_id_encoded'] = person_encoder.transform(df.student_id)
+    df['question_id_encoded'] = item_encoder.transform(df.question_id)
+
+    df_tensor = torch.tensor(
+                            df[['student_id_encoded', 'question_id_encoded', 'correct']].values,
+                            dtype=torch.int64
+                        )
+    x_data, y_data = df_tensor[:, :-1], df_tensor[:, -1]
+    y_data = y_data.double()
+
+    return FixedParamsDataset(
+                ques_id = x_data[:, 1], stu_id = x_data[:, 0], correct = y_data,
+                fixed_stu_params = fixed_stu_params, fixed_ques_params = fixed_ques_params,
+                use_tvt = use_tvt,
+                tvt_vector = tvt_vector,
+                ques_encoder = item_encoder, stu_encoder = person_encoder
+            )
