@@ -253,3 +253,13 @@ class AttribDataset(PyroDataset):
         out = super().get_test_data()
         out['ques_attrib_list'] = self.ques_attrib_list
         return out
+
+class FixedParamsDataset(PyroDataset):
+
+    def __init__(self, ques_id, stu_id, correct, fixed_stu_params, fixed_ques_params,
+                 use_tvt = False, tvt_vector = None,
+                 ques_encoder = None, stu_encoder = None):
+        super().__init__(ques_id = ques_id, stu_id = stu_id, correct = correct, use_tvt = use_tvt, tvt_vector = tvt_vector, ques_encoder = ques_encoder, stu_encoder = stu_encoder)
+        self.fixed_stu_params = fixed_stu_params
+        self.fixed_ques_params = fixed_ques_params
+

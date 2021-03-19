@@ -64,3 +64,6 @@ def create_attrib_dataset(df, use_tvt, tvt_vector = None):
                 tvt_vector = tvt_vector,
                 ques_encoder = item_encoder, stu_encoder = person_encoder
             )
+
+def create_fixedparam_dataset(df, fixed_params, use_tvt, tvt_vector = None):
+    pass
