@@ -60,6 +60,23 @@ class Pyro2ParamModel(PyroModel):
         prob = self.pred_fn(param_store['theta_loc'], param_store['alpha_loc'], param_store['beta_loc'], data_dict['stu_id'], data_dict['ques_id'])
         return prob
 
+class PyroFixedParam2ParamModel(PyroModel):
+
+    def train_one_step(self, data_dict):
+        elbo = self.svi.step(
+                    ques_id = data_dict['ques_id'], stu_id = data_dict['stu_id'], correct = data_dict['correct'],
+                    fixed_ques_params = data_dict['fixed_ques_params'], fixed_stu_params = data_dict['fixed_stu_params']
+                )
+        res = {'elbo' : elbo}
+        return res
+
+    def predict(self, data_dict):
+        if not self.pred_fn:
+            raise Exception('No prediction function specified.')
+        param_store = pyro.get_param_store()
+        prob = self.pred_fn(param_store['theta_loc'], param_store['alpha_loc'], param_store['beta_loc'], data_dict['stu_id'], data_dict['ques_id'])
+        return prob
+
 class PyroFactorizationModel(PyroModel):
 
     def __init__(self, model, guide, pred_fn = None, lr = 0.05, n_latent = 5, l2_factor = None):
@@ -256,10 +273,38 @@ class AttribDataset(PyroDataset):
 
 class FixedParamsDataset(PyroDataset):
 
-    def __init__(self, ques_id, stu_id, correct, fixed_stu_params, fixed_ques_params,
+    def __init__(self, ques_id, stu_id, correct,
+                 fixed_stu_params, fixed_ques_params,
                  use_tvt = False, tvt_vector = None,
                  ques_encoder = None, stu_encoder = None):
+
         super().__init__(ques_id = ques_id, stu_id = stu_id, correct = correct, use_tvt = use_tvt, tvt_vector = tvt_vector, ques_encoder = ques_encoder, stu_encoder = stu_encoder)
         self.fixed_stu_params = fixed_stu_params
         self.fixed_ques_params = fixed_ques_params
+
+        # calculate trainable params for later use
+        trainable_stu = np.logical_not(np.isin(stu_id.detach().numpy(), fixed_stu_params['encoded_id']))
+        self.fixed_stu_params['trainable_id'] = stu_id[trainable_stu].unique()
+        self.fixed_stu_params['n_trainable'] = self.fixed_stu_params['trainable_id'].numel()
+        trainable_ques = np.logical_not(np.isin(ques_id.detach().numpy(), fixed_ques_params['encoded_id']))
+        self.fixed_ques_params['trainable_id'] = ques_id[trainable_ques].unique()
+        self.fixed_ques_params['n_trainable'] = self.fixed_ques_params['trainable_id'].numel()
+
+    def get_training_data(self):
+        out = super().get_training_data()
+        out['fixed_stu_params'] = self.fixed_stu_params
+        out['fixed_ques_params'] = self.fixed_ques_params
+        return out
+
+    def get_validation_data(self):
+        out = super().get_validation_data()
+        out['fixed_stu_params'] = self.fixed_stu_params
+        out['fixed_ques_params'] = self.fixed_ques_params
+        return out
+
+    def get_test_data(self):
+        out = super().get_test_data()
+        out['fixed_stu_params'] = self.fixed_stu_params
+        out['fixed_ques_params'] = self.fixed_ques_params
+        return out
 
