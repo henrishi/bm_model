@@ -14,6 +14,7 @@ from pyro.infer import SVI, Trace_ELBO, Predictive
 from pyro.infer.util import zero_grads, torch_item
 
 from model_utils import get_train_val_test_vector, TRAIN_INT, VAL_INT, TEST_INT
+from pyro_model_fp import TwoPartTensor
 
 """
 Model holders
@@ -74,7 +75,28 @@ class PyroFixedParam2ParamModel(PyroModel):
         if not self.pred_fn:
             raise Exception('No prediction function specified.')
         param_store = pyro.get_param_store()
-        prob = self.pred_fn(param_store['theta_loc'], param_store['alpha_loc'], param_store['beta_loc'], data_dict['stu_id'], data_dict['ques_id'])
+
+        fixed_stu_params = data_dict['fixed_stu_params']
+        fixed_ques_params = data_dict['fixed_ques_params']
+
+        fixed_stu_id = fixed_stu_params['encoded_id']
+        fixed_theta_loc = fixed_stu_params['params']['theta_loc']
+        fixed_ques_id = fixed_ques_params['encoded_id']
+        fixed_alpha_loc = fixed_ques_params['params']['alpha_loc']
+        fixed_beta_loc = fixed_ques_params['params']['beta_loc']
+
+        trainable_ques_id = fixed_ques_params['trainable_id']
+        trainable_stu_id = fixed_stu_params['trainable_id']
+
+        # combining fixed with trainable parameters
+        theta_combined = TwoPartTensor(trainable_stu_id, fixed_stu_id, param_store['theta_loc'], fixed_theta_loc)
+        alpha_combined = TwoPartTensor(trainable_ques_id, fixed_ques_id, param_store['alpha_loc'], fixed_alpha_loc)
+        beta_combined = TwoPartTensor(trainable_ques_id, fixed_ques_id, param_store['beta_loc'], fixed_beta_loc)
+
+        prob = self.pred_fn(
+                    theta_combined, alpha_combined, beta_combined,
+                    stu_id = data_dict['stu_id'], ques_id = data_dict['ques_id']
+                )
         return prob
 
 class PyroFactorizationModel(PyroModel):
