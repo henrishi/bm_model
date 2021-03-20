@@ -22,7 +22,7 @@ def create_dataset(df, use_tvt, tvt_vector = None):
 
     df_tensor = torch.tensor(
                             df[['student_id_encoded', 'question_id_encoded', 'correct']].values,
-                            dtype=torch.int64
+                            dtype = torch.int64
                         )
     x_data, y_data = df_tensor[:, :-1], df_tensor[:, -1]
     y_data = y_data.double()
@@ -46,7 +46,7 @@ def create_attrib_dataset(df, use_tvt, tvt_vector = None):
 
     df_tensor = torch.tensor(
                             df[['student_id_encoded', 'question_id_encoded', 'correct']].values,
-                            dtype=torch.int64
+                            dtype = torch.int64
                         )
     x_data, y_data = df_tensor[:, :-1], df_tensor[:, -1]
     y_data = y_data.double()
@@ -88,14 +88,14 @@ def create_fixedparam_dataset(df, fixed_params, use_tvt, tvt_vector = None):
     fixed_stu_params = {
         'id' : fp_stu[select_stu],
         'params' : {
-            name : fixed_params['stu_param']['params'][name][select_stu] \
+            name : torch.tensor(fixed_params['stu_param']['params'][name][select_stu], dtype = torch.float64) \
             for name in fixed_params['stu_param']['params']
         },
     }
     fixed_ques_params = {
         'id' : fp_ques[select_ques],
         'params' : {
-            name : fixed_params['ques_param']['params'][name][select_ques] \
+            name : torch.tensor(fixed_params['ques_param']['params'][name][select_ques], dtype = torch.float64) \
             for name in fixed_params['ques_param']['params']
         },
     }
@@ -112,10 +112,14 @@ def create_fixedparam_dataset(df, fixed_params, use_tvt, tvt_vector = None):
 
     df_tensor = torch.tensor(
                             df[['student_id_encoded', 'question_id_encoded', 'correct']].values,
-                            dtype=torch.int64
+                            dtype = torch.int64
                         )
     x_data, y_data = df_tensor[:, :-1], df_tensor[:, -1]
     y_data = y_data.double()
+
+    # adding encoded ids to fixed params
+    fixed_stu_params['encoded_id'] = torch.tensor(person_encoder.transform(fixed_stu_params['id']), dtype = torch.int64)
+    fixed_ques_params['encoded_id'] = torch.tensor(item_encoder.transform(fixed_ques_params['id']), dtype = torch.int64)
 
     return FixedParamsDataset(
                 ques_id = x_data[:, 1], stu_id = x_data[:, 0], correct = y_data,
