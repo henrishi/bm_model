@@ -1,9 +1,7 @@
 # Bayesian Measurement Models for Online Sparse Settings
 
 
-The rise of popular mobile education applications produced data where a large number of students answers a small subset of items in a large question bank.
-
-Traditional linking approaches from the education measurement literature cannot scale to this context.
+The rise of popular mobile education applications produced data where a large number of students answers a small subset of items in a large question bank. Traditional linking approaches from the education measurement literature cannot scale to this context.
 
 We propose and evaluate a set of models designed to overcome traditional limitations. The models take advantage of factorization techniques and Bayesian variational inference to meet the needs of this context.
 
