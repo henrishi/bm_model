@@ -36,6 +36,7 @@ You can run the model on a small dataset using the following line in a terminal:
 ```
 python run_experiment.py
 ```
+Reading through `run_experiment.py` will give you a good sense of how the different pieces fit together.
 
 # Learning Pyro
 
