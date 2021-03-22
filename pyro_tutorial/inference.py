@@ -1,9 +1,6 @@
 # Running through a Pyro tutorial
 # with focus on low-level API for 
 # inference: http://pyro.ai/examples/intro_part_ii.html
-# 
-# Author: Zhaolei (Henry) Shi -- zshi2@stanford.edu
-
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -32,7 +29,6 @@ if __name__ == '__main__':
 
     conditioned_scale = pyro.condition(scale, data={"measurement": 9.5})
 
-
     guess = 8.5
 
     pyro.clear_param_store()
@@ -48,5 +44,3 @@ if __name__ == '__main__':
         losses.append(svi.step(guess))
         a.append(pyro.param("a").item())
         b.append(pyro.param("b").item())
-
-    set_trace()

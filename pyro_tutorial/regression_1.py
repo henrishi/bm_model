@@ -2,8 +2,6 @@
 # with focus on API for stochastic
 # variational inference (SVI). Based on
 # tutorial at https://pyro.ai/examples/bayesian_regression.html
-# 
-# Author: Zhaolei (Henry) Shi -- zshi2@stanford.edu
 
 
 import os

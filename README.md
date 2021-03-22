@@ -34,3 +34,7 @@ You can run the model on a small dataset using the following line in a terminal:
 python run_experiment.py
 ```
 
+# Learning Pyro
+
+To get a better sense of how Pyro works, you can follow the examples in `pyro_tutorial` (copied from Pyro's documentation). Also, consider reading through a [minimal implementation of Pyro](http://pyro.ai/examples/minipyro.html). This was instrumental for my own understanding of Pyro.
+

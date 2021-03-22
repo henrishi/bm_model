@@ -1,8 +1,6 @@
 # Running through a Pyro tutorial
 # with focus on low leve API
 # https://pyro.ai/examples/bayesian_regression_ii.html
-# 
-# Author: Zhaolei (Henry) Shi -- zshi2@stanford.edu
 
 import logging
 import os
