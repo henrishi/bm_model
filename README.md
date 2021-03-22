@@ -5,6 +5,9 @@ The rise of popular mobile education applications produced data where a large nu
 
 We propose and evaluate a set of models designed to overcome traditional limitations. The models take advantage of factorization techniques and Bayesian variational inference to meet the needs of this context.
 
+Author:
+
+Zhaolei (Henry) Shi -- zshi2@stanford.edu
 
 # Introduction
 
